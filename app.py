@@ -1,20 +1,21 @@
-# app.py - 正确的完整版本
-from flask import Flask
+# app.py - 适配网站结构的版本
 import os
+import sys
 
-# 1. 创建 Flask 应用实例（这行必须有！）
-app = Flask(__name__)
+# 将项目根目录添加到Python路径
+project_root = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, project_root)
 
-# 2. 添加路由
-@app.route('/')
-def home():
-    return 'Hello, World! This app is now working on Render!'
+# 从app模块导入create_app函数
+from app import create_app
 
-@app.route('/health')
-def health():
-    return 'OK', 200
+# 根据环境变量选择配置，默认使用生产环境
+config_name = os.environ.get('FLASK_CONFIG', 'production')
 
-# 3. 启动应用（只有直接运行时才执行）
+# 创建完整的应用实例，加载所有蓝图和配置
+app = create_app(config_name)
+
 if __name__ == '__main__':
+    # 使用环境变量中的PORT，默认5000
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=(config_name == 'development'))
